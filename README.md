@@ -1,44 +1,92 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Advanced Styled-Components
 
-## Available Scripts
+## Extending Styles
 
-In the project directory, you can run:
+From the Styled-Components Documentation:
+*Quite frequently you might want to use a component, but change it slightly for a single case. Now, you could pass in an interpolated function and change them based on some props, but that's quite a lot of effort for overriding the styles once.*
+*To easily make a new component that inherits the styling of another, just wrap it in the styled() constructor.*
 
-### `npm start`
+	const TomatoButton = styled(Button)`
+		  color: tomato;
+		  border-color: tomato;
+		`
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This is similar to how you extend the style of a react-router-dom 
+component like { Link }.
+TomatoButton has all the qualities of Button with a few modifications. This is much easier than rewriting the entire component.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+We can see that the new TomatoButton still resembles Button, while we have only added two new rules.
+In some cases you might want to change which tag or component a styled component renders. This is common when building a navigation bar for example, where there are a mix of anchor links and buttons but they should be styled identically.
+For this situation, we have an escape hatch. You can use the "as" polymorphic prop to dynamically swap out the element that receives the styles you wrote:
 
-### `npm test`
+<TomatoButton as="a" href="/">Link with Tomato Button styles</TomatoButton>
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This is great because you can style elements with different types seamlessly inline without creating lots of duplicate styled-components.
+	
+
+## Passing Props
 
-### `npm run build`
+From the Styled-Components Documentation:
+*If the styled target is a simple element (e.g. styled.div), styled-components passes through any known HTML attribute to the DOM. If it is a custom React component (e.g. styled(MyComponent)), styled-components passes through all props.*
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const Input = styled.input`
+  padding: 0.5em;
+  margin: 0.5em;
+  color: ${props => props.inputColor || "palevioletred"};
+  background: papayawhip;
+  border: none;
+  border-radius: 3px;
+`
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+// Render a styled text input with the standard input color, and one with a custom input color
+render(
+  <div>
+    <Input defaultValue="@probablyup" type="text" />
+    <Input defaultValue="@geelen" type="text" inputColor="rebeccapurple" />
+  </div>
+);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+In the first <Input> the text will be rendered as the default value assigned.
+The second <Input> has an inputColor and takes precedence over the default color “palevioletred”. The first will be paleviolet red and the second will be rebeccapurple.
 
-### `npm run eject`
+
+## Theming
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+From the Styled-Components Documentation:
+*styled-components has full theming support by exporting a <ThemeProvider> wrapper component. This component provides a theme to all React components underneath itself via the context API. In the render tree all styled-components will have access to the provided theme, even when they are multiple levels deep.*
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+// Define our button, but with the use of props.theme this time
+const Button = styled.button`
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border-radius: 3px;
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  /* Color the border and text with theme.main */
+  color: ${props => props.theme.main};
+  border: 2px solid ${props => props.theme.main};
+`
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+// We are passing a default theme for Buttons that arent wrapped in 
+// the ThemeProvider
+Button.defaultProps = {
+  theme: {
+    main: "palevioletred"
+  }
+}
 
-## Learn More
+// Define what props.theme will look like
+const theme = {
+  main: "mediumseagreen"
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+render(
+  <div>
+    <Button>Normal</Button>
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    <ThemeProvider theme={theme}>
+      <Button>Themed</Button>
+    </ThemeProvider>
+  </div>
+)
+
