@@ -9,7 +9,8 @@ font-size: ${props => props.theme.main};
 PostText.defaultprops = {
   theme: {
     main: ".5rem",
-    bgcolor: "green"
+    bgcolor: "green",
+    font: "Lato"
   }
 }
 
@@ -31,6 +32,24 @@ const Photo = styled.div`
 height: 8vh;
 padding-right: 3vw;
 `
+
+const StyledDate = styled.div`
+font-size: .5rem;
+`
+
+const ReviewContent = styled.div`
+display: flex;
+`
+
+const StyledDateAndAuthor = styled.div`
+padding-right: 2vw;
+`
+
+const StyledAuthor = styled.div`
+padding-bottom: .5vw;
+`
+
+const StyledReview = styled.div``
 
 export default class Main extends Component {
 
@@ -66,12 +85,16 @@ export default class Main extends Component {
       return (
         <PostDiv key = {i}>
         <Photo as="img" src={post.image} alt={post.title} />
-        <div>
-          <div>{post.date}</div>
-          <div>{post.author}</div>
-          <div>{post.title}</div>
-          <div>{post.review}</div>
-        </div>
+        <ReviewContent>
+          <StyledDateAndAuthor>
+            <StyledAuthor>{post.author}</StyledAuthor>
+            <StyledDate>{post.date}</StyledDate>
+          </StyledDateAndAuthor>
+          <StyledReview>
+            <div>{post.title}</div>
+            <div>{post.review}</div>
+          </StyledReview>
+        </ReviewContent>
         </PostDiv>
       )
     })
